@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>StreamSync Uploader - Anmeldung wird abgeschlossen ...</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 500px; margin: 100px auto; text-align: center; color: #1a1a1a; }
+  .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: #2563eb; border-radius: 50%; margin: 24px auto; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .fallback { display: none; margin-top: 24px; }
+  a.button { display: inline-block; margin-top: 12px; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <h2>Anmeldung wird abgeschlossen ...</h2>
+  <div class="spinner"></div>
+  <p>Du wirst gleich automatisch zurück zu StreamSync Uploader geleitet.</p>
+
+  <div class="fallback" id="fallback">
+    <p>Falls sich nichts öffnet, klicke hier:</p>
+    <a class="button" id="manualLink" href="#">Zurück zur App</a>
+  </div>
+
+  <script>
+    // TikTok redirects here with ?code=...&state=... (or &error=...) in the
+    // query string, because TikTok requires an HTTPS redirect_uri and refuses
+    // http://127.0.0.1 loopback URIs. This page's only job is to immediately
+    // forward those parameters on to the desktop app via a custom URI scheme,
+    // which Windows has registered to launch StreamSyncUploader.exe.
+    const params = window.location.search; // e.g. "?code=abc&state=xyz"
+    const appUrl = "streamsyncuploader://oauth-callback" + params;
+
+    document.getElementById("manualLink").href = appUrl;
+
+    // Attempt automatic hand-off.
+    window.location.href = appUrl;
+
+    // If nothing happened after a moment (e.g. the app isn't installed, or the
+    // browser blocked the custom-scheme navigation), show a manual fallback link.
+    setTimeout(function () {
+      document.getElementById("fallback").style.display = "block";
+    }, 1500);
+  </script>
+</body>
+</html>
